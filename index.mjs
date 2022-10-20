@@ -276,36 +276,18 @@ app.post('/preUpdate', async(req, res) => {
 					$('#pid').attr('style', 'color: red;');
 				} else {
 
-					/****************************
-					 * Find the image with type *
-					 ****************************/
+					/****************************************************
+					 * Set image file name and find the image with type *
+					 ****************************************************/
 					fileName = id;
-					let isfind=false, file='#', filestat;
-					const imgupdate = path.join(__dirname, 'public/img/upload', `${updateData[0].pid}`);
 
-					if(!isfind){
-						try { filestat = fs.statSync(imgupdate+'.jpg'); } catch(e){}
-						if(filestat !== undefined && filestat.isFile()) {
-							isfind = true;
-							file = `./img/upload/${updateData[0].pid}.jpg`
-						}
-					}
+					const imgPath = path.join(__dirname, 'public/img/upload');
+					const fileInf = getFile(imgPath, id);
 
-					if(!isfind)	 {
-						try { filestat=fs.statSync(imgupdate+'.png'); } catch(e){}
-						if(filestat !== undefined && filestat.isFile()) {
-							isfind = true;
-							file = `./img/upload/${updateData[0].pid}.png`
-						}
-					}
-
-					if(!isfind) {
-						try { filestat = fs.statSync(imgupdate+'.tif'); } catch(e){}
-						if(filestat !== undefined && filestat.isFile()) {
-							isfind = true;
-							file = `./img/upload/${updateData[0].pid}.tif`
-						}
-					}
+					let imgFile = '#';
+					if(fileInf.file !== '')
+						imgFile = path.join('img/upload', fileInf.file);
+					//console.log("file in preupdate", imgFile);
 
 
 					/*
@@ -322,9 +304,10 @@ app.post('/preUpdate', async(req, res) => {
 								<th width="10%">ID</th>
 								<th width="15%">Serial Number</th>
 								<th width="20%">Description</th>
-								<th width="15%">Quantity</th>
-								<th width="15%">Price</th>
-								<th width="25%">Entry Date</th>
+								<th width="10%">Quantity</th>
+								<th width="10%">Price</th>
+								<th width="20%">Entry Date</th>
+								<th width="15%">Image</th>
 								</tr>
 							<thead>
 							</thead>
@@ -338,6 +321,9 @@ app.post('/preUpdate', async(req, res) => {
 									<td>
 										<label style="padding: 10px 0px 3px 0px;">${ dbDate }</label>
 										<input type="date" name="date">
+									</td>
+									<td>
+										<img src="${imgFile}" width="16" height="16">
 										&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" class="btn" value="Save">
 									</td>
 								</tr>
@@ -482,7 +468,6 @@ function getFile(filePath, fileName) {
 
 	let isfind=false, file='', filestat, extension='';
 	const fileSource = path.join(filePath, fileName);
-	console.log("In getfile", fileSource);
 
 	if(!isfind){
 		try { filestat = fs.statSync(fileSource+'.jpg'); } catch(e){}

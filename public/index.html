@@ -58,7 +58,7 @@
 							<tr id="selectRow" width="100%">
 								<td style="text-align: left;">
 									<select id="searchType" name="searchType" onchange="javascript:showType()">
-										<option value="" selected disabled>Please select type...</option>
+										<option value="" selected disabled>Please select search type...</option>
 										<option value="id">Search by id</option>
 										<option value="date">Search by date</option>
 										<option value="description">Search by description</option>
@@ -92,5 +92,26 @@
 			<div id="sum" class="sum"></div>
 		</div>
 		<script src="./js/index.js"></script>
+		<script>
+			function printResult() {
+				const divId= document.getElementById('searchResult');
+				const title = "Search Result";
+
+				let mywindow = window.open('', 'PRINT', 'height=650,width=900,top=100,left=150');
+
+				 mywindow.document.write(`<html><head><title>${title}</title>`);
+				 mywindow.document.write('</head><body >');
+				 mywindow.document.write(divId.innerHTML);
+				 mywindow.document.write('</body></html>');
+
+				 mywindow.document.close(); // necessary for IE >= 10
+				 mywindow.focus(); // necessary for IE >= 10*/
+
+				 mywindow.print();
+				 mywindow.close();
+
+				 return true;
+			}
+		</script>
 	</body>
 </html>
