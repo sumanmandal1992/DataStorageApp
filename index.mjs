@@ -295,7 +295,7 @@ app.post('/preUpdate', async(req, res) => {
 					 */
 					let dbDate = new Date(updateData[0].entryDate).toLocaleString();
 					dbDate = dbDate.split(',')[0];
-
+					
 					const form=`
 						<form action="/update" method="post">
 							<input type="hidden" name="hidPid" value="${updateData[0].pid}">
@@ -315,7 +315,7 @@ app.post('/preUpdate', async(req, res) => {
 								<tr>
 									<td> <input type="text" name="id" value="${ updateData[0].pid }"> </td>
 									<td> <input type="text" name="srno" value="${ updateData[0].srno }"> </td>
-									<td> <input type="text" name="desc" value="${ updateData[0].description }"> </td>
+									<td> <input type="text" name="desc" value="${ updateData[0].description.replace(/"|'/g, function(x){if(x=='"') return '&quot;'; else return '&apos;';}) }"> </td>
 									<td> <input type="text" name="qnty" value="${ updateData[0].qnty }"> </td>
 									<td> <input type="text" name="price" value="${ updateData[0].prperqty }"> </td>
 									<td>
@@ -330,6 +330,7 @@ app.post('/preUpdate', async(req, res) => {
 							</tbody>
 							</table>
 						</form>
+						<br>
 						<form action="/updateimg" method="post" enctype="multipart/form-data">
 							<label style="color: #8F3A84; font-size: 18px">Upload an image for update</lable>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="file" name="updateImage" required>

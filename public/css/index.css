@@ -151,3 +151,9 @@ span {
 	font-style: italic;
 	font-size: 20px;
 }
+
+select {
+	border-radius: 5px;
+	padding: 3px;
+	font-style: italic;
+}
