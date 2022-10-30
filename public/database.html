@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html charset=UTF-8">
+		<title>YUVAN GARMENTS</title>
+		<link rel="stylesheet" type="text/css" href="./css/index.css">
+		<link rel="icon" type="image/ico" href="./img/favicon.ico">
+	</head>
+
+	<body>
+		<div class="companyName"><h1>YUVAN &nbsp;&nbsp;&nbsp; GARMENTS</h1></div>
+		<div class="dataContainer">
+			<div class="saveDB">
+				<form action="/save" method="post">
+					<table id="insertData" class="insertData">
+						<thead>
+							<tr>
+								<th width="10%">ID</th>
+								<th width="15%">Serial Number</th>
+								<th width="20%">Description</th>
+								<th width="15%">Quantity</th>
+								<th width="20%">Price / QTY</th>
+								<th width="20%">Entry Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input type="text" id="id" name="id" placeholder="Can be empty"></td>
+								<td><input type="text" id="srno" name="srno" placeholder="Required" required></td>
+								<td><input type="text" id="desc" name="desc" placeholder="Required" required></td>
+								<td><input type="text" id="qnty" name="qnty" placeholder="Required" required></td>
+								<td><input type="text" id="price" name="price" placeholder="Required" required></td>
+								<td>
+									<input type="date" id="date" name="date" placeholder="Can be empty">
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" id="savebtn" class="btn" value="Save">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<p id="saveStats"></p>
+				</form>
+				<form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+				</form>
+				<hr>
+				<form action="/search" method="post" id="searchDB">
+					<table width="100%">
+						<thead width="100%">
+							<tr width="100%">
+								<span>Search Database</span>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr id="selectRow" width="100%">
+								<td style="text-align: left;">
+									<select id="searchType" name="searchType" onchange="javascript:showType()">
+										<option value="" selected disabled>Please select search type...</option>
+										<option value="id">Search by id</option>
+										<option value="date">Search by date</option>
+										<option value="description">Search by description</option>
+									</select>&nbsp;&nbsp;&nbsp;
+								</td>
+							</tr>
+							<tr id="searchBtnRow" width="100%">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td style="text-align: right;"><input type="submit" id="searchbtn" class="btn" value="Search"></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+				<form action="preUpdate" method="post">
+					<table>
+						<tbody>
+							<tr>
+								<td>ID for update&nbsp;&nbsp;</td>
+								<td><input type="text" name="id" id="pid" required></td>
+								<td style="text-align: right;"><input type="submit" id="updatebtn" class="btn" value="Update"></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+			<hr>
+			<div id="searchResult" class="searchResult"></div>
+			<div id="sum" class="sum"></div>
+		</div>
+		<script src="./js/index.js"></script>
+		<script>
+			function printResult() {
+				const divId= document.getElementById('searchResult');
+				const title = "Search Result";
+
+				let mywindow = window.open('', 'PRINT', 'height=650,width=900,top=100,left=150');
+
+				 mywindow.document.write(`<html><head><title>${title}</title>`);
+				 mywindow.document.write('</head><body >');
+				 mywindow.document.write(divId.innerHTML);
+				 mywindow.document.write('</body></html>');
+
+				const tble = mywindow.document.getElementById('resultData');
+
+				const row = tble.rows;
+				console.log(row[0].cells.length);
+				for(let i=0; i<row[0].cells.length; i++) {
+					let colname = row[0].cells[i].innerHTML;
+					if(colname.search('Image') != -1) {
+						for(let j=0; j<row.length; j++) {
+							row[j].deleteCell(i);
+						}
+					}
+				}
+
+				tble.setAttribute('border', '1');
+
+				 mywindow.document.close(); // necessary for IE >= 10
+				 mywindow.focus(); // necessary for IE >= 10*/
+
+				 mywindow.print();
+				 mywindow.close();
+
+				 return true;
+			}
+		</script>
+	</body>
+</html>

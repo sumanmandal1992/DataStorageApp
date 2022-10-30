@@ -10,12 +10,14 @@
 			<div id="container">
 				<div id="logo"><h1>Login</h1></div>
 				<div id="logfrm">
-					<form action="/login" method="post">
+					<form action="/login" method="POST">
 						<label for="id" id="uid">User ID </label><br>
-						<input type="text" placeholder="User ID"><br><br>
+						<input type="text" name="uid" placeholder="User ID"><br><br>
 						<label for="password" id="pass">Password </label><br>
-						<input type="password" placeholder="Password"><br><br>
+						<input type="password" name="passwd" placeholder="Password"><br><br>
 						<button type="submit" class="btn">Login</button><br><br>
+					</form>
+					<form action="/register" method="GET">
 						<input type="submit" value="New User? Register">
 					</form>
 				</div>

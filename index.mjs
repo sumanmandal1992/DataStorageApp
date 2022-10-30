@@ -7,6 +7,7 @@ import mariadb from 'mariadb';
 import dotenv from 'dotenv';
 import * as cheerio from 'cheerio';
 import url from 'url';
+import sha512 from 'js-sha512';
 import result from './public/module/result.mjs';
 const app = express();
 dotenv.config();
@@ -67,14 +68,65 @@ app.use(express.urlencoded({ extended: true }));
 /*************************
  * Creating http server. *
  *************************/
-app.get('/', (req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'index.html');
+app.get('/login', (req, res) => {
+	const loginPath=path.join(__dirname, 'public', 'login.html');
+
+	let filestat;
+	try { filestat=fs.statSync(loginPath); } catch(e){}
+
+	if(filestat !== undefined && filestat.isFile()) {
+		res.sendFile(loginPath);
+	} else {
+		res.statusCode=404;
+		res.send("<h1>Page not found.</h1>");
+	}
+});
+
+
+
+app.post('/login', async (req, res) => {
+	const indexPath=path.join(__dirname, 'public', 'database.html');
+	const loginPath=path.join(__dirname, 'public', 'login.html');
 
 	let filestat;
 	try { filestat=fs.statSync(indexPath); } catch(e){}
 
+	const {uid, passwd} = req.body;
+	const encpasswd = sha512(passwd);
+
 	if(filestat !== undefined && filestat.isFile()) {
-		res.sendFile(indexPath);
+		let conn;
+
+		try {
+			conn = await pool.getConnection();
+
+			const credential = await conn.query('SELECT * FROM credential WHERE uid = ?', [uid]);
+
+			if(credential[0] !== undefined && credential[0].passwd === encpasswd) {
+				res.sendFile(indexPath);
+
+			} else {
+				let filestat1;
+				try { filestat1=fs.statSync(loginPath); } catch(e){}
+
+				if(filestat1 !== undefined && filestat1.isFile()) {
+					fs.readFile(loginPath, 'utf8', (err, data) => {
+						if(err) console.log(err);
+
+						const $ = cheerio.load(data);
+
+						data = $.html();
+						res.send(data);
+					});
+				}
+			}
+
+		} catch(err) {
+			if(err) console.log(err);
+			res.sendFile(loginPath);
+		} finally {
+			if(conn) conn.end();
+		}
 	} else {
 		res.statusCode=404;
 		res.send("<h1>Page not found.</h1>");
@@ -84,7 +136,7 @@ app.get('/', (req, res) => {
 
 
 app.post('/save', async(req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'index.html');
+	const indexPath=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
 	try { filestat=fs.statSync(indexPath); } catch(e){}
@@ -169,7 +221,7 @@ app.post('/save', async(req, res) => {
 
 
 app.post('/upload', upload.single('uploadFile'), (req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'index.html');
+	const indexPath=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
 	try { filestat=fs.statSync(indexPath); } catch(e){}
@@ -192,7 +244,7 @@ app.post('/upload', upload.single('uploadFile'), (req, res) => {
 
 
 app.post('/search', async(req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'index.html');
+	const indexPath=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
 	try { filestat=fs.statSync(indexPath); } catch(e){}
@@ -250,7 +302,7 @@ app.post('/search', async(req, res) => {
 
 
 app.post('/preUpdate', async(req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'index.html');
+	const indexPath=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
 	try { filestat=fs.statSync(indexPath); } catch(e){}
@@ -359,7 +411,7 @@ app.post('/preUpdate', async(req, res) => {
 
 
 app.post('/update', async(req, res) => {
-	const indexPath = path.join(__dirname, 'public', 'index.html');
+	const indexPath = path.join(__dirname, 'public', 'database.html');
 	const filePath = path.join(__dirname, 'public/img/upload');
 
 	let filestat, oldFile, newFile;
@@ -445,7 +497,7 @@ app.post('/update', async(req, res) => {
 
 
 app.post('/updateimg', upload.single('updateImage'), (req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'index.html');
+	const indexPath=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
 	try { filestat=fs.statSync(indexPath); } catch(e){}
@@ -504,6 +556,9 @@ function getFile(filePath, fileName) {
 }
 
 
+/*
+ * Run server at a port.
+ */
 const port = 8000;
 app.listen(port, () => {
 	console.log("Server listening at port:", port);
