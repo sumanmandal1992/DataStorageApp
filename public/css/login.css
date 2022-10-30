@@ -1,0 +1,77 @@
+body {
+	background-color: lightgray;
+}
+
+div#main {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+div#container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: 5%;
+	width: 20%;
+	height: 60%;
+	border: 2px solid rgba(0, 0, 10, 60%);
+	border-radius: 5px;
+	padding: 15px;
+	background: radial-gradient(green, lightgreen, yellow, orange);
+}
+
+h1 {
+	color: #fcedd8;
+	font-family: 'Niconne', cursive;
+	font-size: 40px;
+	margin: 1;
+	padding: 0;
+	text-shadow: 1px 0px 1px #eb452b, 
+                 2px 0px 2px #efa032, 
+                 3px 0px 3px #46b59b, 
+                 4px 0px 4px #017e7f, 
+                 5px 0px 5px #052939, 
+                 6px 0px 6px #c11a2b, 
+                 7px 0px 7px #c11a2b, 
+                 8px 0px 8px #c11a2b, 
+                 9px 0px 9px #c11a2b;
+}
+
+div#logfrm {
+	width: 100%;
+}
+
+input {
+	width: 95%;
+	border-radius: 5px;
+	height: 30px;
+	background: linear-gradient(green, lightgreen, yellow, orange);
+}
+
+input[type="submit"]:hover {
+	cursor: pointer;
+	font-style: oblique;
+}
+
+.btn {
+	padding: 5px;
+	border-radius: 10px;
+	font-size: 17px;
+	font-style: italic;
+	font-weight: bold;
+	background-color: #0D69B8;
+	color: white;
+	margin-left: 80%;
+}
+
+.btn:hover {
+	background-color: blue;
+	cursor: pointer;
+}
+
+label {
+	font-size: 18px;
+	font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}

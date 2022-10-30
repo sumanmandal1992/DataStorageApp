@@ -99,18 +99,32 @@
 
 				let mywindow = window.open('', 'PRINT', 'height=650,width=900,top=100,left=150');
 
-				 mywindow.document.write(`<html><head><title>${title}</title>`);
-				 mywindow.document.write('</head><body >');
-				 mywindow.document.write(divId.innerHTML);
-				 mywindow.document.write('</body></html>');
+				mywindow.document.write(`<html><head><title>${title}</title>`);
+				mywindow.document.write('</head><body >');
+				mywindow.document.write(divId.innerHTML);
+				mywindow.document.write('</body></html>');
 
-				 mywindow.document.close(); // necessary for IE >= 10
-				 mywindow.focus(); // necessary for IE >= 10*/
+				// Designing the search result.
+				const tble = mywindow.document.getElementById('resultData');
+				const row = tble.rows;
+				for(let i=0; i<row[0].cells.length; i++) {
+					let cellname = row[0].cells[i].innerHTML;
+					console.log(cellname);
+					if(cellname.search('Image') != -1) {
+						for(let j=0; j<row.length; j++) {
+							row[j].deleteCell(i);
+						}
+					}
+				}
+				tble.setAttribute('border', '1');
 
-				 mywindow.print();
-				 mywindow.close();
+				mywindow.document.close(); // necessary for IE >= 10
+				mywindow.focus(); // necessary for IE >= 10*/
 
-				 return true;
+				mywindow.print();
+				mywindow.close();
+
+				return true;
 			}
 		</script>
 	</body>

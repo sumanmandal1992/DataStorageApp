@@ -60,8 +60,8 @@ function result(qry, indexPath, res) {
 						<td>${ qry[i].srno}</td>
 						<td>${ qry[i].description }</td>
 						<td>${ qry[i].qnty }</td>
-						<td>&#8377;${ qry[i].prperqty }</td>
-						<td>&#8377;${ qry[i].qnty * qry[i].prperqty }</td>
+						<td>&#8377;&nbsp;${ qry[i].prperqty }</td>
+						<td>&#8377;&nbsp;${ qry[i].subtotal}</td>
 						<td>${ dbDate }</td>
 						<td><img src="${file}" id="uploadedImg" width="16px" height="16px"></td>
 					</tr>
@@ -69,7 +69,7 @@ function result(qry, indexPath, res) {
 			}
 
 			const table = `
-				<table class="resultData">
+				<table id="resultData" class="resultData">
 					<thead>
 						<tr>
 							<th width="10%">ID</th>
@@ -88,7 +88,7 @@ function result(qry, indexPath, res) {
 				</table>
 				`;
 			$('#searchResult').append(table);
-			$('#sum').append(`<h3 class="total">Total price: &#8377;${ sum }</h3>`);
+			$('#sum').append(`<h3 class="total">Total price: &#8377;&nbsp;${ sum }</h3>`);
 			$('#sum').append('<button type="button" id="printbtn" class="btn" onclick="printResult()">Print result</button>');
 
 		} else {

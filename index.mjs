@@ -36,11 +36,14 @@ const fileStorage = multer.diskStorage({
 	},
 	filename: function(req, file, callback) {
 		let extension='';
-		if(file.mimetype==='image/jpg') extension = '.jpg';
-		else if(file.mimetype==='image/jpeg') extension='.jpg';
-		else if(file.mimetype==='image/png') extension='.png';
-		else if(file.mimetype==='image/tif') extension='.tif';
-		callback(null, fileName+extension);
+		if(fileName === '') callback(null, null);
+		else {
+			if(file.mimetype==='image/jpg') extension = '.jpg';
+			else if(file.mimetype==='image/jpeg') extension='.jpg';
+			else if(file.mimetype==='image/png') extension='.png';
+			else if(file.mimetype==='image/tif') extension='.tif';
+			callback(null, fileName+extension);
+		}
 	}
 });
 const fileFilter = (req, file, callback) => {
