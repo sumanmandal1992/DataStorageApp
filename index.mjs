@@ -69,13 +69,29 @@ app.use(express.urlencoded({ extended: true }));
  * Creating http server. *
  *************************/
 app.get('/login', (req, res) => {
-	const loginPath=path.join(__dirname, 'public', 'login.html');
+	const loginDoc=path.join(__dirname, 'public', 'login.html');
 
 	let filestat;
-	try { filestat=fs.statSync(loginPath); } catch(e){}
+	try { filestat=fs.statSync(loginDoc); } catch(e){}
 
 	if(filestat !== undefined && filestat.isFile()) {
-		res.sendFile(loginPath);
+		res.sendFile(loginDoc);
+	} else {
+		res.statusCode=404;
+		res.send("<h1>Page not found.</h1>");
+	}
+});
+
+
+
+app.get('/logout', (req, res) => {
+	const loginDoc=path.join(__dirname, 'public', 'login.html');
+
+	let filestat;
+	try { filestat=fs.statSync(loginDoc); } catch(e){}
+
+	if(filestat !== undefined && filestat.isFile()) {
+		res.sendFile(loginDoc);
 	} else {
 		res.statusCode=404;
 		res.send("<h1>Page not found.</h1>");
@@ -85,11 +101,11 @@ app.get('/login', (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'database.html');
-	const loginPath=path.join(__dirname, 'public', 'login.html');
+	const dbDoc=path.join(__dirname, 'public', 'database.html');
+	const loginDoc=path.join(__dirname, 'public', 'login.html');
 
 	let filestat;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	const {uid, passwd} = req.body;
 	const encpasswd = sha512(passwd);
@@ -103,14 +119,14 @@ app.post('/login', async (req, res) => {
 			const credential = await conn.query('SELECT * FROM credential WHERE uid = ?', [uid]);
 
 			if(credential[0] !== undefined && credential[0].passwd === encpasswd) {
-				res.sendFile(indexPath);
+				res.sendFile(dbDoc);
 
 			} else {
 				let filestat1;
-				try { filestat1=fs.statSync(loginPath); } catch(e){}
+				try { filestat1=fs.statSync(loginDoc); } catch(e){}
 
 				if(filestat1 !== undefined && filestat1.isFile()) {
-					fs.readFile(loginPath, 'utf8', (err, data) => {
+					fs.readFile(loginDoc, 'utf8', (err, data) => {
 						if(err) console.log(err);
 
 						const $ = cheerio.load(data);
@@ -123,7 +139,7 @@ app.post('/login', async (req, res) => {
 
 		} catch(err) {
 			if(err) console.log(err);
-			res.sendFile(loginPath);
+			res.sendFile(loginDoc);
 		} finally {
 			if(conn) conn.end();
 		}
@@ -135,11 +151,105 @@ app.post('/login', async (req, res) => {
 
 
 
-app.post('/save', async(req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'database.html');
+app.get('/register', (req, res) => {
+	const regDoc = path.join(__dirname, 'public', 'register.html');
 
 	let filestat;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(regDoc); } catch(e){}
+
+	if(filestat !== undefined && filestat.isFile()) {
+		res.sendFile(regDoc);
+	} else {
+		res.statusCode=404;
+		res.send("<h1>Page not found.</h1>");
+	}
+});
+
+
+
+app.get('/login', (req, res) => {
+	const loginDoc = path.join(__dirname, 'public', 'login.html');
+
+	let filestat;
+	try { filestat=fs.statSync(loginDoc); } catch(e){}
+
+	if(filestat !== undefined && filestat.isFile()) {
+		res.sendFile(loginDoc);
+	} else {
+		res.statusCode=404;
+		res.send("<h1>Page not found.</h1>");
+	}
+});
+
+
+
+app.post('/register', (req, res) => {
+	const regDoc = path.join(__dirname, 'public', 'register.html');
+
+	let filestat;
+	try { filestat=fs.statSync(regDoc); } catch(e){}
+	const { uname, uid, passwd, repasswd } = req.body;
+
+	if(filestat !== undefined && filestat.isFile()) {
+		if(passwd === repasswd) {
+			const success = `
+				<!DOCTYPE html><html lang="en">
+					<head>
+						<meta charset="UTF-8">
+						<title>Registration Successfull</title>
+					</head>
+					<body>
+						<form action="/registersuccess" method="GET">
+							<h3>Registration successfull</h3>
+							<button type="submit" class="btn">Login</button>
+						</form>
+					<body>
+				</html>
+				`;
+			res.send(success);
+		} else {
+			fs.readFile(regDoc, 'utf8', (err, data) => {
+				if(err) console.log(err);
+
+				const $ = cheerio.load(data);
+
+				$('#uname').attr('value', uname);
+				$('#uid').attr('value', uid);
+				$('#warn').text('Password mismatched.');
+
+				data = $.html();
+				res.send(data);
+			});
+		}
+	} else {
+		res.statusCode=404;
+		res.send("<h1>Page not found.</h1>");
+	}
+});
+
+
+
+app.get('/registersuccess', (req, res) => {
+	const loginDoc = path.join(__dirname, 'public', 'login.html');
+
+	let filestat;
+	try { filestat=fs.statSync(loginDoc); } catch(e){}
+
+	if(filestat !== undefined && filestat.isFile()) {
+		res.sendFile(loginDoc);
+	} else {
+		res.statusCode=404;
+		res.send("<h1>Page not found.</h1>");
+	}
+});
+
+
+
+app.post('/save', async(req, res) => {
+	const dbDoc=path.join(__dirname, 'public', 'database.html');
+
+	let filestat;
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	const {id, srno, desc, qnty, price, date, uploadFile} = req.body;
 
@@ -172,7 +282,7 @@ app.post('/save', async(req, res) => {
 			const cur_rec = await conn.query('SELECT pid FROM YuvanGarments WHERE cur_rec = (SELECT MAX(cur_rec) FROM YuvanGarments)');
 			fileName = cur_rec[0].pid;
 
-			fs.readFile(indexPath, 'utf8', (err, data) => {
+			fs.readFile(dbDoc, 'utf8', (err, data) => {
 				if(err) console.log(err);
 
 				const $ = cheerio.load(data);
@@ -194,7 +304,7 @@ app.post('/save', async(req, res) => {
 		}
 		catch(err) {
 			if(err) console.log(err);
-			fs.readFile(indexPath, 'utf8', (err, data) => {
+			fs.readFile(dbDoc, 'utf8', (err, data) => {
 				if(err) console.log(err);
 
 				const $ = cheerio.load(data);
@@ -221,13 +331,13 @@ app.post('/save', async(req, res) => {
 
 
 app.post('/upload', upload.single('uploadFile'), (req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'database.html');
+	const dbDoc=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	if(filestat !== undefined && filestat.isFile()) {
-		fs.readFile(indexPath, 'utf8', (err, data) => {
+		fs.readFile(dbDoc, 'utf8', (err, data) => {
 			if(err) console.log(err);
 
 			const $ = cheerio.load(data);
@@ -244,10 +354,10 @@ app.post('/upload', upload.single('uploadFile'), (req, res) => {
 
 
 app.post('/search', async(req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'database.html');
+	const dbDoc=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	const {searchType, id, dateFrom, dateTo, cdate, description} = req.body;
 	let qry;
@@ -281,11 +391,11 @@ app.post('/search', async(req, res) => {
 					else if(dateFrom !== '' && dateTo !== '')
 						qry = await conn.query('SELECT * FROM YuvanGarments WHERE entryDate BETWEEN ? AND ?', [dateFrom, dateTo]);
 				}
-				result(qry, indexPath, res);
+				result(qry, dbDoc, res);
 
 			} else {
 				qry = '';
-				result(qry, indexPath, res);
+				result(qry, dbDoc, res);
 			}
 
 		} catch(err) {
@@ -302,10 +412,10 @@ app.post('/search', async(req, res) => {
 
 
 app.post('/preUpdate', async(req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'database.html');
+	const dbDoc=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	const { id } = req.body;
 
@@ -318,7 +428,7 @@ app.post('/preUpdate', async(req, res) => {
 
 			const updateData = await conn.query('SELECT * FROM YuvanGarments WHERE pid = ?', [id]);
 
-			fs.readFile(indexPath, 'utf8', (err, data) => {
+			fs.readFile(dbDoc, 'utf8', (err, data) => {
 				if(err) console.log(err);
 
 				const $ = cheerio.load(data);
@@ -411,11 +521,11 @@ app.post('/preUpdate', async(req, res) => {
 
 
 app.post('/update', async(req, res) => {
-	const indexPath = path.join(__dirname, 'public', 'database.html');
+	const dbDoc = path.join(__dirname, 'public', 'database.html');
 	const filePath = path.join(__dirname, 'public/img/upload');
 
 	let filestat, oldFile, newFile;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	const { hidPid, id, srno, desc, qnty, price, date } = req.body;
 
@@ -458,7 +568,7 @@ app.post('/update', async(req, res) => {
 				}
 			}
 
-			fs.readFile(indexPath, 'utf8', (err, data) => {
+			fs.readFile(dbDoc, 'utf8', (err, data) => {
 				if(err) console.log(err);
 
 				const $ = cheerio.load(data);
@@ -477,7 +587,7 @@ app.post('/update', async(req, res) => {
 
 		} catch(err) {
 			if(err) console.log(err);
-			fs.readFile(indexPath, 'utf8', (err, data) => {
+			fs.readFile(dbDoc, 'utf8', (err, data) => {
 				if(err) console.log(err);
 
 				const $ = cheerio.load(data);
@@ -497,13 +607,13 @@ app.post('/update', async(req, res) => {
 
 
 app.post('/updateimg', upload.single('updateImage'), (req, res) => {
-	const indexPath=path.join(__dirname, 'public', 'database.html');
+	const dbDoc=path.join(__dirname, 'public', 'database.html');
 
 	let filestat;
-	try { filestat=fs.statSync(indexPath); } catch(e){}
+	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
 	if(filestat !== undefined && filestat.isFile()) {
-		fs.readFile(indexPath, 'utf8', (err, data) => {
+		fs.readFile(dbDoc, 'utf8', (err, data) => {
 			if(err) console.log(err);
 
 			const $ = cheerio.load(data);

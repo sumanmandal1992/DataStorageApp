@@ -3,12 +3,20 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html charset=UTF-8">
 		<title>YUVAN GARMENTS</title>
-		<link rel="stylesheet" type="text/css" href="./css/index.css">
+		<link rel="stylesheet" type="text/css" href="./css/database.css">
 		<link rel="icon" type="image/ico" href="./img/favicon.ico">
 	</head>
 
 	<body>
-		<div class="companyName"><h1>YUVAN &nbsp;&nbsp;&nbsp; GARMENTS</h1></div>
+		<div id="headContainer">
+			<div id="companyLogo"></div>
+			<div class="companyName"><h1>YUVAN &nbsp;&nbsp; GARMENTS</h1></div>
+			<div id="logoutBtn">
+				<form action="/logout" method="GET">
+					<button type="submit" class="btn">Logout</button>
+				</form>
+			</div>
+		</div>
 		<div class="dataContainer">
 			<div class="saveDB">
 				<form action="/save" method="post">
