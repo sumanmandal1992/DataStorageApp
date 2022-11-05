@@ -16,7 +16,7 @@ function result(qry, indexPath, res) {
 
 			let filestat=[], file, isfind;
 
-			let sum = 0;
+			let sum = 0.0;
 			let dataRow = '';
 			const len = qry.length;
 
@@ -51,7 +51,7 @@ function result(qry, indexPath, res) {
 				}
 
 
-				sum = sum + (qry[i].qnty * qry[i].prperqty);
+				sum = sum + parseFloat(qry[i].subtotal);
 				let dbDate = new Date(qry[i].entryDate).toLocaleString();
 				dbDate = dbDate.split(',')[0];
 				dataRow += `

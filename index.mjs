@@ -131,6 +131,9 @@ app.post('/login', async (req, res) => {
 
 						const $ = cheerio.load(data);
 
+						$('#warn').text('Invalid credential.');
+						$('#warn').attr('style', 'color:red;');
+
 						data = $.html();
 						res.send(data);
 					});
@@ -183,7 +186,7 @@ app.get('/login', (req, res) => {
 
 
 
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
 	const regDoc = path.join(__dirname, 'public', 'register.html');
 
 	let filestat;
@@ -191,22 +194,54 @@ app.post('/register', (req, res) => {
 	const { uname, uid, passwd, repasswd } = req.body;
 
 	if(filestat !== undefined && filestat.isFile()) {
-		if(passwd === repasswd) {
-			const success = `
-				<!DOCTYPE html><html lang="en">
-					<head>
-						<meta charset="UTF-8">
-						<title>Registration Successfull</title>
-					</head>
-					<body>
-						<form action="/registersuccess" method="GET">
-							<h3>Registration successfull</h3>
-							<button type="submit" class="btn">Login</button>
-						</form>
-					<body>
-				</html>
-				`;
-			res.send(success);
+		if(passwd === repasswd && passwd.length >= 8 && (uname !== '' || uname !== undefined) && (uid !== '' || uid !== undefined)) {
+
+			let conn;
+			try {
+				conn = await pool.getConnection();
+
+				await conn.query('INSERT INTO user(uid, uname) VALUES(?, ?)', [uid, uname]);
+				await conn.query('INSERT INTO credential(uid, passwd) VALUES(?, ?)', [uid, sha512(passwd)]);
+
+				const success = `
+					<!DOCTYPE html><html lang="en">
+						<head>
+							<meta charset="UTF-8">
+							<title>Registration Successfull</title>
+						</head>
+						<body>
+							<form action="/registersuccess" method="GET">
+								<h3>Registration successfull</h3>
+								<button type="submit" class="btn">Login</button>
+							</form>
+						<body>
+					</html>
+					`;
+				res.send(success);
+			} catch(err) {
+				if(err) console.log(err);
+
+				fs.readFile(regDoc, 'utf8', (err, data) => {
+					if(err) console.log(err);
+
+					const $ = cheerio.load(data);
+
+					$('#uname').attr('value', uname);
+					$('#uid').attr('value', uid);
+					if(uid.length < 8)
+						$('#uidWarn').text('User ID must be at least 8 character long.');
+					else
+						$('#uidWarn').text('User ID already exist.');
+					if(passwd.length < 8)
+						$('#passWarn').text('Password must be at least 8 character long.');
+
+					data = $.html();
+					res.send(data);
+				});
+			} finally {
+				if(conn) conn.end();
+			}
+
 		} else {
 			fs.readFile(regDoc, 'utf8', (err, data) => {
 				if(err) console.log(err);
@@ -215,7 +250,10 @@ app.post('/register', (req, res) => {
 
 				$('#uname').attr('value', uname);
 				$('#uid').attr('value', uid);
-				$('#warn').text('Password mismatched.');
+				if(passwd.length < 8)
+					$('#passWarn').text('Password must be at least 8 character long.');
+				else
+					$('#passWarn').text('Password mismatched.');
 
 				data = $.html();
 				res.send(data);
