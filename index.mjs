@@ -188,6 +188,7 @@ app.get('/login', (req, res) => {
 
 app.post('/register', async (req, res) => {
 	const regDoc = path.join(__dirname, 'public', 'register.html');
+	const successDoc = path.join(__dirname, 'public', 'success.html');
 
 	let filestat;
 	try { filestat=fs.statSync(regDoc); } catch(e){}
@@ -203,21 +204,14 @@ app.post('/register', async (req, res) => {
 				await conn.query('INSERT INTO user(uid, uname) VALUES(?, ?)', [uid, uname]);
 				await conn.query('INSERT INTO credential(uid, passwd) VALUES(?, ?)', [uid, sha512(passwd)]);
 
-				const success = `
-					<!DOCTYPE html><html lang="en">
-						<head>
-							<meta charset="UTF-8">
-							<title>Registration Successfull</title>
-						</head>
-						<body>
-							<form action="/registersuccess" method="GET">
-								<h3>Registration successfull</h3>
-								<button type="submit" class="btn">Login</button>
-							</form>
-						<body>
-					</html>
-					`;
-				res.send(success);
+				let filestat1;
+				try { filestat1=fs.statSync(successDoc); } catch(e){}
+				if(filestat1 !== undefined && filestat1.isFile()) {
+					res.sendFile(successDoc);
+				} else {
+					res.statusCode=404;
+					res.send("<h1>Page not found.</h1>");
+				}
 			} catch(err) {
 				if(err) console.log(err);
 

@@ -66,6 +66,11 @@ h1 {
 	align-items: center;
 }
 
+#logoImg {
+	height: 60px;
+	width: 60px
+}
+
 .companyName {
 	width: 80%;
 	display: flex;
