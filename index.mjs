@@ -502,7 +502,7 @@ app.post('/preUpdate', async(req, res) => {
 								<th width="15%">Serial Number</th>
 								<th width="20%">Description</th>
 								<th width="10%">Quantity</th>
-								<th width="10%">Price</th>
+								<th width="10%">Price / QTY</th>
 								<th width="20%">Entry Date</th>
 								<th width="15%">Image</th>
 								</tr>
