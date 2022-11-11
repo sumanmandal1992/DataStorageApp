@@ -283,29 +283,18 @@ app.post('/save', async(req, res) => {
 	let filestat;
 	try { filestat=fs.statSync(dbDoc); } catch(e){}
 
-	const {id, srno, desc, qnty, price, date, uploadFile} = req.body;
+	const {srno, desc, qnty, price, date, uploadFile} = req.body;
 
 	if(filestat !== undefined && filestat.isFile()) {
 		let conn;
 
 		try {
 			conn = await pool.getConnection();
-			const test = await conn.query('SELECT COUNT(*) AS length FROM YuvanGarments');
 
-			let tid;
-			if(test[0] !== undefined) {
-				tid = id;
-			} else {
-				tid = 1;
-			}
 
-			if(tid !== '' && date !== '')
-				await conn.query('INSERT INTO YuvanGarments(pid, srno, description, qnty, prperqty, entryDate) values(?, ?, ?, ?, ?, ?)', [tid, srno, desc, qnty, price, date]);
-			else if(tid !== '' && date === '')
-				await conn.query('INSERT INTO YuvanGarments(pid, srno, description, qnty, prperqty) values(?, ?, ?, ?, ?)', [tid, srno, desc, qnty, price]);
-			else if(tid === '' && date !== '')
+			if(date !== '')
 				await conn.query('INSERT INTO YuvanGarments(srno, description, qnty, prperqty, entryDate) values(?, ?, ?, ?, ?)', [srno, desc, qnty, price, date]);
-			else
+			else if(date === '')
 				await conn.query('INSERT INTO YuvanGarments(srno, description, qnty, prperqty) values(?, ?, ?, ?)', [srno, desc, qnty, price]);
 
 			/*
@@ -510,7 +499,7 @@ app.post('/preUpdate', async(req, res) => {
 							</thead>
 							<tbody>
 								<tr>
-									<td> <input type="text" name="id" value="${ updateData[0].pid }"> </td>
+									<td> <input type="text" name="id" value="${ updateData[0].pid }" disabled> </td>
 									<td> <input type="text" name="srno" value="${ updateData[0].srno }"> </td>
 									<td> <input type="text" name="desc" value="${ updateData[0].description.replace(/"|'/g, function(x){if(x=='"') return '&quot;'; else return '&apos;';}) }"> </td>
 									<td> <input type="text" name="qnty" value="${ updateData[0].qnty }"> </td>
@@ -573,31 +562,9 @@ app.post('/update', async(req, res) => {
 			} else {
 				flag = true;
 				if(date === '')
-					await conn.query('UPDATE YuvanGarments SET pid=?, srno=?, description=?, qnty=?, prperqty=? WHERE pid=?', [id, srno, desc, qnty, price, hidPid]);
+					await conn.query('UPDATE YuvanGarments SET srno=?, description=?, qnty=?, prperqty=? WHERE pid=?', [srno, desc, qnty, price, id]);
 				else
-					await conn.query('UPDATE YuvanGarments SET pid=?, srno=?, description=?, qnty=?, prperqty=?, entryDate=? WHERE pid=?', [id, srno, desc, qnty, price, date, hidPid]);
-
-
-				/*
-				 * Changing image file name.
-				 */
-				if(hidPid !== id) {
-					const fileExist = getFile(filePath, hidPid);
-					if(fileExist.file === '') {
-						console.log("File didn't exist.");
-					} else {
-						oldFile = `${filePath}/${fileExist.file}`;
-						newFile = `${filePath}/${id}${fileExist.extension}`;
-						fs.rename(oldFile, newFile, (err) => {
-							if(err) {
-								console.log(err);
-								return;
-							}
-							console.log("File renamed successfully.");
-						});
-						console.log(oldFile, newFile);
-					}
-				}
+					await conn.query('UPDATE YuvanGarments SET srno=?, description=?, qnty=?, prperqty=?, entryDate=? WHERE pid=?', [srno, desc, qnty, price, date, id]);
 			}
 
 			fs.readFile(dbDoc, 'utf8', (err, data) => {
